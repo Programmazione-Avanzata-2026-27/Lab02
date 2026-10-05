@@ -32,17 +32,17 @@ def carica_da_file(file_path):
 
 
 def aggiungi_foto(album, codice, titolo, autore, mese, anno, file_path):
-    # 1. Controllo mese
+
     if mese < 1 or mese > 12:
         return None
 
-    # 2. Controllo se il codice esiste già
+
     for anno_esistente in album:
         for foto in album[anno_esistente]:
             if foto['codice'] == codice:
                 return None
 
-    # 3. Creazione del dizionario per la nuova foto
+    # Creazione del dizionario per la nuova foto
     nuova_foto = {
         'codice': codice,
         'titolo': titolo,
@@ -51,7 +51,7 @@ def aggiungi_foto(album, codice, titolo, autore, mese, anno, file_path):
         'anno': anno
     }
 
-    # 4. Scrittura su file
+
     try:
 
         with open(file_path, 'a', encoding='utf-8') as f:
@@ -62,7 +62,7 @@ def aggiungi_foto(album, codice, titolo, autore, mese, anno, file_path):
         #  file non  trovato, l'operazione fallisce
         return None
 
-    # 5. Aggiornamento del dizionario in memoria
+
     # Se l'anno non c'è ancora nell'album, creo una nuova lista vuota per quell'anno
     if anno not in album:
         album[anno] = []
