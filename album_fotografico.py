@@ -1,19 +1,103 @@
 def carica_da_file(file_path):
-    """Carica le foto dal file, creando un nuovo anno ogni volta che compare per la prima volta"""
-    # TODO
+    album = {}
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            f.readline()
+
+            for riga in f:
+                # Evito problemi con eventuali righe vuote a fine file
+                if not riga.strip():
+                    continue
+
+                elemento = riga.strip().split(',')
+                codice = elemento[0]
+                titolo = elemento[1]
+                autore = elemento[2]
+                mese = int(elemento[3])
+                anno = int(elemento[4])
+
+                # Creo la foto
+                foto = {'codice': codice, 'titolo': titolo, 'autore': autore, 'mese': mese, 'anno': anno}
+
+                # Organizziamo l'album usando l'ANNO come chiave
+                if anno not in album:
+                    album[anno] = []  # Creo la lista per il nuovo anno
+
+                album[anno].append(foto)  # Aggiungo la foto alla lista di quell'anno
+
+        return album
+
+    except FileNotFoundError:
+        return None
 
 
 def aggiungi_foto(album, codice, titolo, autore, mese, anno, file_path):
+    # 1. Controllo mese
+    if mese < 1 or mese > 12:
+        return None
+
+    # 2. Controllo se il codice esiste già
+    for anno_esistente in album:
+        for foto in album[anno_esistente]:
+            if foto['codice'] == codice:
+                return None
+
+    # 3. Creazione del dizionario per la nuova foto
+    nuova_foto = {
+        'codice': codice,
+        'titolo': titolo,
+        'autore': autore,
+        'mese': mese,
+        'anno': anno
+    }
+
+    # 4. Scrittura su file
+    try:
+
+        with open(file_path, 'a', encoding='utf-8') as f:
+
+            riga = f"{codice},{titolo},{autore},{mese},{anno}\n"
+            f.write(riga)
+    except FileNotFoundError:
+        #  file non  trovato, l'operazione fallisce
+        return None
+
+    # 5. Aggiornamento del dizionario in memoria
+    # Se l'anno non c'è ancora nell'album, creo una nuova lista vuota per quell'anno
+    if anno not in album:
+        album[anno] = []
+
+    # Aggiungo la nuova foto alla lista di quell'anno
+    album[anno].append(nuova_foto)
+
+
+    return nuova_foto
+
     """Aggiunge una foto all'album, creando l'anno al volo se non è ancora presente"""
     # TODO
 
 
 def cerca_foto(album, codice):
+
+    for anno in album:
+        for foto in album[anno]:
+            if foto['codice'] == codice:
+                return f"{foto['codice']}, {foto['titolo']}, {foto['autore']}, {foto['mese']}, {foto['anno']}"
+    return None
+
+
+
     """Cerca una foto nell'album dato il codice"""
     # TODO
 
 
 def elenco_foto_anno_per_titolo(album, anno):
+    if anno not in album: #nel testo dice che se l'anno non esiste di restituire None
+        return None
+    titoli = [] #creo la lista di titioli di foto
+    for foto in album[anno]:
+        titoli.append(foto['titolo'])
+    return sorted(titoli)
     """Ordina i titoli delle foto di un dato anno in ordine alfabetico"""
     # TODO
 
@@ -21,6 +105,10 @@ def elenco_foto_anno_per_titolo(album, anno):
 def main():
     album = []
     file_path = "album_fotografico.csv"
+    album = carica_da_file(file_path)
+    #print(album)
+
+
 
     while True:
         print("\n--- MENU ALBUM FOTOGRAFICO ---")
